@@ -8,18 +8,14 @@ cursor = conexion.cursor()
 
 # Definir la consulta SQL con un INNER JOIN
 consulta = '''
-SELECT personas.*, Salarios.*
+SELECT personas.*,Salarios.*
 FROM personas
-INNER JOIN Salarios ON personas.id_rol = Rol
+INNER JOIN Salarios ON personas.id_rol = id_salarios
 '''
 #Se ejecuta la consulta
 cursor.execute(consulta)        
 
-# Obtener todos los registros resultantes
-registros = cursor.fetchall()
-
-# Imprimir los resultados
-for registro in registros:
+for registro in cursor.fetchall(): 
     print(registro)
 
 # Cerrar la conexión
