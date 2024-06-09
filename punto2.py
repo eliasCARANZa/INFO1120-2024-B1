@@ -6,7 +6,7 @@ def obtener_datos_y_guardar_csv(db_path, consulta, csv_path):
         # Conectar a la base de datos SQLite
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-
+        
         # Ejecutar la consulta
         cursor.execute(consulta)
 
