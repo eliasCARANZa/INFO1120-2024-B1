@@ -1,20 +1,21 @@
-import os
-import sqlite3
-import pandas as pd
+import sqlite3,pandas as pd
 from docx import Document
 from docx.shared import  Pt,Cm,Mm
 
-# Función para obtener datos de la base de datos
-def obtener_datos_desde_bd(db_path):
-    conn = sqlite3.connect(db_path)
-    query = '''
+def obtener_datos_desde_bd(bd):      #Función para obtener datos de la base de datos 
+    #Se conecta con la base de datos bd
+    conexion = sqlite3.connect(bd)
+    #Cosulta en sqlite 
+    consulta = '''                   
     SELECT personas.*, Salarios.*
     FROM personas
     INNER JOIN Salarios ON personas.id_rol = id_Salarios
     '''
-    df = pd.read_sql_query(query, conn)
-    conn.close()
-    return(df)
+    df = pd.read_sql_query(consulta, conexion)   #Se recuperan los dato en un DataFrame
+
+    conexion.close()   #Se cierra la coxion
+
+    return(df)      #Se devuleve el DataFrame
 
 # Función que genera un contrato de ejemplo
 def example_contract(date: str, rol: str, address: str, rut: str, full_name: str, nationality: str, birth_date: str, profession: str, salary: str):
@@ -84,24 +85,26 @@ def example_contract(date: str, rol: str, address: str, rut: str, full_name: str
     run.add_picture("imagenes/footer1.png")
     document.save(f'{full_name}.docx')
 
-# Ruta de la base de datos
-db_path = 'db_personas.db'
+bd = 'db_personas.db'      #Ruta de la base de datos
 
-# Obtener los datos de la base de datos
-df = obtener_datos_desde_bd(db_path)
-print(df.head(49))  # Verificar la estructura del DataFrame
+df = obtener_datos_desde_bd(bd)    #Se obtienen los datos de la base de datos
 
-# Solicitar al usuario el índice de la persona
-try:
-    index_row = int(input("Ingrese el índice de la persona para generar el contrato: "))
-    if index_row < 0 or index_row >= len(df):
-        raise ValueError("Índice fuera de rango")
-except ValueError as e:
-    print(f"Error: {e}")
-    exit()
+print(df)  #Se muestra la DataFrame
 
-# Obtener los datos de la persona seleccionada
-sub_df = df.iloc[index_row]
+while True:           #Se solicita al usuario el índice de la persona
+    try:
+        indice = int(input("Ingrese el índice de la persona para generar el contrato: "))
+        if indice < 0 or indice >= len(df):
+            raise IndexError("Índice fuera de rango")
+        break  # Si llegamos aquí, el índice es válido, salimos del bucle
+    except IndexError:
+        print("Error, intente nuevamente con un indice de 0 a 48.")
+    except ValueError:
+        print("Error,ingrese un numero y que este en los indices 0 a 48")
+
+
+#Se obtienen los datos de la persona seleccionada
+sub_df = df.iloc[indice]
 date = sub_df['fecha_ingreso']
 rol = sub_df['Rol']
 address = sub_df['residencia']
@@ -112,6 +115,6 @@ birth_date = sub_df['fecha_de_nacimiento']
 profession = sub_df['profesion']
 salary = sub_df['Sueldo']
 
-# Generar el contrato para la persona especificada
+#Se genera el contrato para la persona especificada
 example_contract(date, rol, address, rut, full_name, nationality, birth_date, profession, str(salary))
 print(f"Contrato generado para {full_name}.")
