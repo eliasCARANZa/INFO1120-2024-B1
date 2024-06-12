@@ -1,5 +1,4 @@
-import sqlite3
-import pandas as pd
+import sqlite3,pandas as pd
 from docx import Document
 from docx.shared import Pt, Cm, Mm
 
